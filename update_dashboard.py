@@ -405,6 +405,7 @@ def main():
             not v['fields'].get('duedate')                                            # sin fecha real
             or v['fields'].get('duedate','')>=TODAY                                   # fecha cambió al futuro
             or v['fields']['status'].get('statusCategory',{}).get('key','')=='done'   # completada
+        or v['fields']['status'].get('name','') in ('Bloqueada','Bloqueado','Blocked')  # bloqueado
             or v['fields']['status'].get('name','') in                                # estados done
                ('Terminado','Done','Cerrado','Resuelto','Closed','Resolved'))}
         if late_false:
@@ -439,7 +440,7 @@ def main():
     # Paso A: obtener TODAS las tareas no-done con sus campos reales del API
     print('Sin fecha + Sin responsable...')
     all_nondone=jira_all(
-        "project in ("+ALL_SW_DYN+") AND statusCategory != Done ORDER BY project ASC",
+        "project in ("+ALL_SW_DYN+") AND statusCategory != Done AND status not in ('Bloqueada','Bloqueado','Blocked') ORDER BY project ASC",
         ["summary","status","duedate","assignee","project"],100,50)
     _nd_total=len(all_nondone)
     print('  No-done total: '+str(_nd_total)+(' ⚠️ POSIBLE TRUNCADO (llegó al límite)' if _nd_total==5000 else ''))
@@ -470,6 +471,7 @@ def main():
         if 'fields' not in task: continue
         tf=task['fields']
         if tf['status'].get('statusCategory',{}).get('key','')=='done': continue
+        if tf['status'].get('name','') in ('Bloqueada','Bloqueado','Blocked'): continue
         sw_t=tf.get('project',{}).get('key',''); mo_t=SW_TO_MO.get(sw_t)
         if not mo_t: continue
         real_due=tf.get('duedate')    # valor REAL del API
@@ -581,7 +583,7 @@ def main():
     nodt_keys=[t['key'] for mo in nodt_by_mo.values() for t in mo]
     if nodt_keys:
         vn=verify_by_keys(nodt_keys,['duedate'])
-        nf={v['key'] for v in vn if v['fields'].get('duedate')}
+        nf={v['key'] for v in vn if v['fields'].get('duedate') or v['fields'].get('status',{}).get('name','') in ('Bloqueada','Bloqueado','Blocked')}
         if nf:
             for mk in list(nodt_by_mo.keys()):
                 nodt_by_mo[mk]=[t for t in nodt_by_mo[mk] if t['key'] not in nf]
@@ -593,7 +595,7 @@ def main():
     noown_keys=[t['key'] for mo in noown_by_mo.values() for t in mo]
     if noown_keys:
         vo=verify_by_keys(noown_keys,['assignee'])
-        ra={v['key'] for v in vo if v['fields'].get('assignee')}
+        ra={v['key'] for v in vo if v['fields'].get('assignee') or v['fields'].get('status',{}).get('name','') in ('Bloqueada','Bloqueado','Blocked')}
         if ra:
             for mk in list(noown_by_mo.keys()):
                 noown_by_mo[mk]=[t for t in noown_by_mo[mk] if t['key'] not in ra]
