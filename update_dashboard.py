@@ -59,7 +59,16 @@ def main():
         "MO-61",  # 1EP sin frente en Jira
     "MO-62",  # 1EP sin frente/subfrente en Jira
     "MO-71",  # 3CP sin frente/subfrente en Jira PD
-    }
+        # Nuevas exclusiones (sin frente/subfrente en Jira PD):
+    "MO-8",  # 2D sin frente/subfrente
+    "MO-9",  # 2B sin frente/subfrente
+    "MO-11",  # 3C sin frente (solo subfrente)
+    "MO-12",  # 3B sin frente/subfrente
+    "MO-32",  # 3C sin frente/subfrente
+    "MO-70",  # 3BP sin frente/subfrente
+    "MO-72",  # 3GP sin frente/subfrente
+    "MO-94",  # 2D sin frente (solo subfrente)
+}
     MO_TO_SW = {v:k for k,v in SW_TO_MO.items()}
     
     # KNOWN_TOTALS: se actualiza dinámicamente si not_done > total
