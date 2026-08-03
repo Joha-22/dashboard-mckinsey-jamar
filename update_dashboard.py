@@ -62,7 +62,6 @@ def main():
         # Nuevas exclusiones (sin frente/subfrente en Jira PD):
     "MO-8",  # 2D sin frente/subfrente
     "MO-9",  # 2B sin frente/subfrente
-    "MO-11",  # 3C sin frente (solo subfrente)
     "MO-12",  # 3B sin frente/subfrente
     "MO-32",  # 3C sin frente/subfrente
     "MO-70",  # 3BP sin frente/subfrente
@@ -257,6 +256,11 @@ def main():
         # También excluir si está en EXCLUDED_MO (índice Jira puede estar desactualizado)
         if key in EXCLUDED_MO:
             continue
+        # Inferir frente si está vacío pero el subfrente lo indica
+        if not frente and subfrente in ('S&OP','Inventarios','Almacenamiento','Transporte','Post-venta'):
+            frente='Operaciones'
+        elif not frente and subfrente in ('FOE','E2E proceso de Credito','Curva de Valor de Credito','Modelo de Riesgos'):
+            frente='Crédito'
         if not frente or not subfrente:
             continue  # excluir del dashboard completamente
     
