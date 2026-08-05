@@ -1125,7 +1125,7 @@ const SW_PROJECTS = {
   'DEP':{name:"1E. Depuración del portafolio",frente:"Operaciones",subfrente:"S&OP",tasks:{total:139,done:119,prog:3,todo:17,late:0}},
   'MSOP':{name:"1A. Mejora del Proceso S&OP",frente:"Operaciones",subfrente:"S&OP",tasks:{total:29,done:23,prog:0,todo:6,late:0}},
   'MEJ':{name:"1B. Mejorar la asertividad del Forecast",frente:"Operaciones",subfrente:"S&OP",tasks:{total:37,done:22,prog:0,todo:15,late:0}},
-  'PROVED':{name:"1C. Modelo de trabajo con proveedores",frente:"Operaciones",subfrente:"S&OP",tasks:{total:37,done:0,prog:2,todo:35,late:0}},
+  'PROVED':{name:"6A. Vendor Management",frente:"Operaciones",subfrente:"Compras",tasks:{total:37,done:0,prog:2,todo:35,late:0}},
   /* ── Inventarios ── */
   'ECI':{name:"2A. Ejecutar la optimización de inventarios",frente:"Operaciones",subfrente:"Inventarios",tasks:{total:28,done:14,prog:5,todo:9,late:0}},
   'DEIT':{name:"2F. Estrategia de inventario en tienda",frente:"Operaciones",subfrente:"Inventarios",tasks:{total:111,done:0,prog:14,todo:97,late:0}},
@@ -1172,8 +1172,7 @@ const SW_PROJECTS = {
 var LATE_TASKS = {
   // 2026-08-05 — 40 tardias
   'MO-36': [
-    {key:'SDR-36',summary:"Onboarding - calidad y transferencia de gestión",duedate:'2026-07-10',assignee:"Sin asignar",status:"To Do" }
-  ],
+    ],
   'MO-44': [
     {key:'TLGDL-11',summary:"Diagnosticar brechas funcionales entre Salesforce, Citrix y App de ventas",duedate:'2026-07-17',assignee:"Carlos Mario Barrera Vega",status:"In Progress" },
     {key:'TLGDL-12',summary:"Diseñar modelo de gestión de leads por etapa del funnel en Salesforce",duedate:'2026-07-20',assignee:"Heidy Márquez",status:"In Progress" }
@@ -1223,8 +1222,7 @@ var LATE_TASKS = {
     {key:'IPDPCDBR-49',summary:"Identificar mejores prácticas",duedate:'2026-07-30',assignee:"Betsy Bibiana Silva Caballero",status:"To Do" }
   ],
   'MO-76': [
-    {key:'OPR-30',summary:"Solicitar recursos a TI + repositorio Git",duedate:'2026-08-04',assignee:"Ervin Trujillo Rojas",status:"In Progress" }
-  ],
+    ],
   'MO-88': [
     {key:'PROP-63',summary:"Ajustar narrativa según resultados",duedate:'2026-07-30',assignee:"Betsy Bibiana Silva Caballero",status:"To Do" },
     {key:'PROP-62',summary:"Identificar mejores prácticas",duedate:'2026-07-30',assignee:"Betsy Bibiana Silva Caballero",status:"To Do" }
@@ -1998,7 +1996,6 @@ var NO_OWNER_TASKS = {
   'MO-36': [
     {key:'SDR-40',summary:"Consecución de poliza internacional",duedate:'2026-08-08',assignee:"Sin asignar",status:"In Progress" },
     {key:'SDR-38',summary:"Firma de contrato pygmalion",duedate:'2026-08-07',assignee:"Sin asignar",status:"In Progress" },
-    {key:'SDR-36',summary:"Onboarding - calidad y transferencia de gestión",duedate:'2026-07-10',assignee:"Sin asignar",status:"To Do" },
     {key:'SDR-32',summary:"Modelo de seleccion, evaluación y monitoreo de proveeduria internacional",duedate:'2026-12-01',assignee:"Sin asignar",status:"Definición" },
     {key:'SDR-30',summary:"Firmas SLA proveeduria China pareto",duedate:'2026-08-31',assignee:"Sin asignar",status:"In Progress" }
   ],
@@ -2401,7 +2398,7 @@ function renderTable(data) {
   document.getElementById('tbl-count').textContent = data.length + ' de ' + DATA.length + ' iniciativas';
   const FRENTES = ['Operaciones','Crédito'];
   const SF_ORDER = {
-    'Operaciones': ['S&OP','Inventarios','Almacenamiento','Transporte','Post-venta'],
+    'Operaciones': ['S&OP','Inventarios','Almacenamiento','Transporte','Post-venta','Compras'],
     'Crédito': ['Curva de Valor Crédito','Modelo de Riesgos','FOE','E2E proceso de Crédito']
   };
   let html = '';
