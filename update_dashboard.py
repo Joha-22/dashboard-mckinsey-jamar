@@ -257,7 +257,7 @@ def main():
         if key in EXCLUDED_MO:
             continue
         # Inferir frente si está vacío pero el subfrente lo indica
-        if not frente and subfrente in ('S&OP','Inventarios','Almacenamiento','Transporte','Post-venta'):
+        if not frente and subfrente in ('S&OP','Inventarios','Almacenamiento','Transporte','Post-venta','Compras'):
             frente='Operaciones'
         elif not frente and subfrente in ('FOE','E2E proceso de Credito','Curva de Valor de Credito','Modelo de Riesgos'):
             frente='Crédito'
