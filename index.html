@@ -2662,8 +2662,25 @@ document.querySelectorAll('.chip[data-grp]').forEach(function(btn){
     if(grp==='frente') STATE.frentes[val]=!STATE.frentes[val];
     else if(grp==='stage') STATE.stages[val]=!STATE.stages[val];
     else if(grp==='cat') STATE.cats[val]=!STATE.cats[val];
-    else if(grp==='sf') STATE.sfs[val]=!STATE.sfs[val];
-    btn.classList.toggle('active');
+    else if(grp==='sf') {
+      // Modo exclusivo: si todos activos o si hay otro activo → mostrar solo el clickeado
+      // Si ya está en modo exclusivo (solo este activo) → volver a todos
+      const sfKeys = Object.keys(STATE.sfs);
+      const allActive = sfKeys.every(function(k){ return STATE.sfs[k]; });
+      const onlyThisActive = sfKeys.every(function(k){ return k===val ? STATE.sfs[k] : !STATE.sfs[k]; });
+      if(onlyThisActive) {
+        // Ya estaba solo → activar todos
+        sfKeys.forEach(function(k){ STATE.sfs[k]=true; });
+        document.querySelectorAll('.chip[data-grp="sf"]').forEach(function(b){ b.classList.add('active'); });
+      } else {
+        // Activar solo este, desactivar los demás
+        sfKeys.forEach(function(k){ STATE.sfs[k]=(k===val); });
+        document.querySelectorAll('.chip[data-grp="sf"]').forEach(function(b){
+          b.classList.toggle('active', b.dataset.val===val);
+        });
+      }
+    }
+    if(grp!=='sf') btn.classList.toggle('active');
     render();
   });
 });
