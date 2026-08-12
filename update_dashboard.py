@@ -671,6 +671,10 @@ def main():
         html=re.sub(
             r"(key:'"+re.escape(mk)+r"'[^\n]*?,ct:)\d+",
             lambda m,v=ct_v_: m.group(1)+v, html, count=1)
+        # cat (categoría: Caso de Negocio / Habilitadora / MVP)
+        if vals.get('cat'):
+            html=re.sub(r"(key:'"+re.escape(mk)+r"'[^}]*?,cat:')[^']*'",
+                        lambda m,v=vals['cat']: m.group(1)+v+"'",html,count=1)
         # sw (desde SW_TO_MO reversa + issuelinks)
         sw_val = vals["sw"] or MO_TO_SW.get(mk,"")
         if sw_val:
