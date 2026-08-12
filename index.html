@@ -1049,7 +1049,8 @@ function renderSFActivities(filtered) {
     let total=0, done=0, prog=0, todo=0, late=0, hasPlan=false, rec=0, ct=0;
     sfItems.forEach(function(d){
       const swInfo = d.sw ? SW_PROJECTS[d.sw] : null;
-      const t = swInfo ? swInfo.tasks : (d.tasks||null);
+      // d.tasks es actualizado por el cronjob — fuente primaria
+      const t = (d.tasks && (d.tasks.total||0) > 0) ? d.tasks : (swInfo ? swInfo.tasks : (d.tasks||null));
       if(t){
         hasPlan=true;
         total+=t.total; done+=t.done; prog+=(t.prog||0); todo+=t.todo; late+=(t.late||0);
