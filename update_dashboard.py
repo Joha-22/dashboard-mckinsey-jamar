@@ -355,14 +355,20 @@ def main():
     tot_B,prog_B=count_by_proj(nd_nodate)
     print("  no-done-con-fecha: "+str(len(nd_fecha))+" | no-done-sin-fecha: "+str(len(nd_nodate)))
     
+    # Query C: done — contar directamente (elimina dependencia de KNOWN_TOTALS)
+    nd_done=jira_all(
+        "project in ("+ALL_SW_DYN+") AND statusCategory = Done ORDER BY project ASC",
+        ["project"],100,30)
+    tot_C,_=count_by_proj(nd_done)
+    print("  done: "+str(len(nd_done))+" issues")
+
     sw_counts={}
-    for sw,total in KNOWN_TOTALS.items():
+    all_sw_keys=set(list(KNOWN_TOTALS.keys())+list(tot_A.keys())+list(tot_B.keys())+list(tot_C.keys()))
+    for sw in all_sw_keys:
         nd_f=tot_A.get(sw,0); nd_n=tot_B.get(sw,0)
         not_done=nd_f+nd_n
-        if not_done>total:
-            print("  WARN: "+sw+" creció — not_done="+str(not_done)+" > known="+str(total))
-            total=not_done
-        done=max(0,total-not_done)
+        done=tot_C.get(sw,0)  # count dinámico desde Jira
+        total=done+not_done
         prog=prog_A.get(sw,0)+prog_B.get(sw,0)
         todo=max(0,not_done-prog)
         sw_counts[sw]=(total,done,prog,todo,0)
@@ -388,7 +394,7 @@ def main():
                 "status":f["status"]["name"]})
     
     # Actualizar late en sw_counts
-    for sw in KNOWN_TOTALS:
+    for sw in sw_counts:
         mo=SW_TO_MO.get(sw,"")
         t,d,p,td,_=sw_counts[sw]
         sw_counts[sw]=(t,d,p,td,len(late_by_mo.get(mo,[])))
