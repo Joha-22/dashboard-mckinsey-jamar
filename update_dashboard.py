@@ -487,6 +487,7 @@ def main():
     # Paso C: clasificar en sin fecha y sin responsable
     nodt_by_mo=defaultdict(list)
     noown_by_mo=defaultdict(list)
+    inprog_by_mo=defaultdict(list)
     for task in all_nondone:
         if 'fields' not in task: continue
         tf=task['fields']
@@ -536,6 +537,9 @@ def main():
             for mo_v in list(nodt_by_mo.keys()):
                 nodt_by_mo[mo_v] = [t for t in nodt_by_mo[mo_v]
                     if t['key'] not in real_dated]
+        # EN CURSO: status es En curso / In progress / Dev en progreso
+        if tf['status'].get('name','') in ('En curso','In progress','Dev en progreso','In Progress','En ejecución'):
+            inprog_by_mo[mo_t].append(t_data)
     # Post-filtro de seguridad noown
     for _mo in list(noown_by_mo.keys()):
         noown_by_mo[_mo]=[t for t in noown_by_mo[_mo]
@@ -707,6 +711,8 @@ def main():
     html=replace_var(html,"NO_DATE_TASKS",build_var("NO_DATE_TASKS",nodt_by_mo,str(total_nodt)+" sin fecha"))
     # Post-filtro: eliminar tareas que llegaron con assignee real
     html=replace_var(html,"NO_OWNER_TASKS",build_var("NO_OWNER_TASKS",noown_by_mo,str(total_noown)+" sin responsable"))
+    total_inprog=sum(len(v) for v in inprog_by_mo.values())
+    html=replace_var(html,"INPROG_TASKS",build_var("INPROG_TASKS",inprog_by_mo,str(total_inprog)+" en curso"))
     
     now_str=datetime.now().strftime("%H:%M")
     # Safety check: no subir HTML si está incompleto (guardia anti-corrupción)
@@ -716,6 +722,7 @@ def main():
         html.count('var WEEK_TASKS') >= 1 and
         html.count('var NO_DATE_TASKS') >= 1 and
         html.count('var NO_OWNER_TASKS') >= 1 and
+        html.count('var INPROG_TASKS') >= 1 and
         len(html) > 200000
     )
     if not _html_ok:
