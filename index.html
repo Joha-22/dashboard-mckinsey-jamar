@@ -371,6 +371,8 @@ tr.grand-total td{background:var(--slate-dk);color:#fff;font-weight:700;font-siz
 .noowner-detail-row td{padding:0;}
 .noowner-panel-title{font-size:10px;font-weight:700;color:#4527A0;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid #D1C4E9;}
 .noowner-panel{background:#F9F7FD;border-top:1px solid #EDE7F6;padding:8px 12px;}
+.inprog-panel{background:#F0F7FF;border-top:2px solid #90CAF9;padding:8px 12px;}
+.inprog-panel-title{font-weight:700;font-size:10px;color:#1565C0;margin-bottom:5px;}
 .noowner-tbl{width:100%;border-collapse:collapse;font-size:11px;}
 .noowner-tbl th{text-align:left;color:#888;font-weight:600;padding:3px 6px;border-bottom:1px solid #EDE7F6;font-size:10px;}
 .noowner-tbl td{padding:4px 6px;border-bottom:1px solid #F3E5F5;color:#333;}
@@ -2645,6 +2647,27 @@ function renderTable(data) {
             +'<th style="width:90px">Tarea</th><th>Actividad</th><th style="width:130px">Vence / Retraso</th><th style="width:160px">Responsable</th>'
             +'</tr></thead><tbody>'+ltRows+'</tbody></table>'
             +'</div></td></tr>';
+
+          // ── En curso (inprog-detail) ──
+          var inprogRows = inprogArr.map(function(t){
+            return '<tr>'
+              +'<td class="tk-key"><a href="https://hubdigitaljamar.atlassian.net/browse/'+t.key+'" target="_blank">'+t.key+'</a></td>'
+              +'<td>'+t.summary+'</td>'
+              +'<td style="color:#888;">'+(t.due||'Sin fecha')+'</td>'
+              +'<td style="color:#1565C0;font-weight:600;">'+t.status+'</td>'
+              +'</tr>';
+          }).join('');
+          if(inprogCount > 0) {
+            html += '<tr class="inprog-detail-row" id="inprog-detail-'+d.key+'" style="display:none;">'
+              +'<td colspan="9"><div class="inprog-panel">'
+              +'<div class="inprog-panel-title">▶ Actividades en curso ('+inprogCount+')</div>'
+              +'<table class="late-tbl"><thead><tr>'
+              +'<th style="width:90px">Tarea</th><th>Actividad</th>'
+              +'<th style="width:100px">Fecha</th>'
+              +'<th style="width:130px">Estado</th>'
+              +'</tr></thead><tbody>'+inprogRows+'</tbody></table>'
+              +'</div></td></tr>';
+          }
         }
 
         // ── Panel 2: Esta semana ──────────────────────────────────────────────
