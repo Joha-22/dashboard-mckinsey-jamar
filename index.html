@@ -363,8 +363,10 @@ tr.grand-total td{background:var(--slate-dk);color:#fff;font-weight:700;font-siz
 
   /* ── No-date panel ── */
 
-.noowner-badge{display:inline-flex;align-items:center;gap:3px;background:#EDE7F6;color:#4527A0;border:1px solid #B39DDB;border-radius:4px;padding:2px 8px;font-size:9.5px;font-weight:700;cursor:pointer
-.inprog-badge{display:inline-flex;align-items:center;gap:3px;background:#E3F2FD;color:#1565C0;border:1px solid #90CAF9;border-radius:4px;padding:2px 8px;font-size:9.5px;font-weight:700;cursor:pointer};margin-top:4px;transition:background .15s;}
+.noowner-badge{display:inline-flex;align-items:center;gap:3px;background:#EDE7F6;color:#4527A0;border:1px solid #B39DDB;border-radius:4px;padding:2px 8px;font-size:9.5px;font-weight:700;cursor:pointer;margin-top:4px;transition:background .15s;}
+.inprog-badge{display:inline-flex;align-items:center;gap:3px;background:#E0F7FA;color:#006064;border:1px solid #80DEEA;border-radius:4px;padding:2px 8px;font-size:9.5px;font-weight:700;cursor:pointer;margin-top:4px;transition:background .15s;}
+.inprog-badge:hover{background:#B2EBF2;}
+.inprog-badge.open{background:#B2EBF2;};margin-top:4px;transition:background .15s;}
 .noowner-badge:hover{background:#D1C4E9;border-color:#9575CD;}
 .noowner-badge.open{background:#D1C4E9;}
 .noowner-detail-row{display:none;}
@@ -1000,7 +1002,7 @@ function toggleInProgTbl(moKey, badge) {
   row.style.display = isOpen ? 'none' : 'table-row';
   badge.classList.toggle('open', !isOpen);
   var n = (INPROG_TASKS[moKey]||[]).length;
-  badge.textContent = isOpen ? '▶ '+n+' en curso ▾' : '▶ '+n+' en curso ▴';
+  badge.textContent = isOpen ? '\u25B6 '+n+' en curso \u25BE' : '\u25B6 '+n+' en curso \u25B4';
 }
 
 function toggleNoOwnerTbl(moKey, badge) {
@@ -2719,7 +2721,7 @@ function renderTable(data) {
         var inprogCount = inprogArr.length;
 
         var inprogBadge = inprogCount > 0
-          ? '<div><span class="inprog-badge" id="inprog-btn-'+d.key+'" onclick="toggleInProgTbl(\''+d.key+'\',this)">▶ '+inprogCount+' en curso ▾</span></div>'
+          ? '<div><span class="inprog-badge" id="inprog-btn-'+d.key+'" onclick="toggleInProgTbl(\''+d.key+'\',this)">\u25B6 '+inprogCount+' en curso \u25BE</span></div>'
           : '';
 
         var noownerBadge = noownerCount > 0
