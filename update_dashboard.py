@@ -380,7 +380,7 @@ def main():
     late_issues=jira_post(
         "project in ("+ALL_SW_DYN+") AND due < '"+TODAY+"' AND statusCategory != Done AND status not in ('Bloqueada','Bloqueado','Blocked') "
         "ORDER BY project ASC, due ASC",
-        ["summary","status","duedate","assignee","project"],100)
+        ["summary","status","duedate","assignee","project","parent"],100)
     late_by_mo=defaultdict(list)
     for i in late_issues:
         if "fields" not in i: continue
@@ -388,10 +388,16 @@ def main():
         if i["fields"]["status"]["name"] in ("Bloqueada","Bloqueado","Blocked"): continue  # excluir bloqueadas de atrasadas
         sw=i["fields"]["project"]["key"]; mo=SW_TO_MO.get(sw); f=i["fields"]
         if mo:
+            _lpf=f.get("parent"); _lps=""; _les=""
+            if _lpf:
+                _lpt=_lpf.get("fields",{}).get("issuetype",{}).get("name","")
+                _lsum=clean(_lpf.get("fields",{}).get("summary",""))
+                if _lpt=="Epic": _les=_lsum
+                else: _lps=_lsum
             late_by_mo[mo].append({"key":i["key"],"summary":clean(f["summary"]),
                 "due":f.get("duedate",""),
                 "assignee":clean((f.get("assignee") or {}).get("displayName","Sin asignar")),
-                "status":f["status"]["name"]})
+                "status":f["status"]["name"],"ps":_lps,"es":_les})
     
     # Actualizar late en sw_counts
     for sw in sw_counts:
@@ -439,17 +445,23 @@ def main():
     week_issues=jira_all(
         "project in ("+ALL_SW_DYN+") AND due >= '"+TODAY+"' AND due <= '"+WEEK_END+"' "
         "AND statusCategory != Done ORDER BY project ASC, due ASC",
-        ["summary","status","duedate","assignee","project"],100,3)
+        ["summary","status","duedate","assignee","project","parent"],100,3)
     week_by_mo=defaultdict(list)
     for i in week_issues:
         if "fields" not in i: continue
         if i["fields"]["status"].get("statusCategory",{}).get("key","")=="done": continue
         sw=i["fields"]["project"]["key"]; mo=SW_TO_MO.get(sw); f=i["fields"]
         if mo:
+            _wpf=f.get("parent"); _wps=""; _wes=""
+            if _wpf:
+                _wpt=_wpf.get("fields",{}).get("issuetype",{}).get("name","")
+                _wsum=clean(_wpf.get("fields",{}).get("summary",""))
+                if _wpt=="Epic": _wes=_wsum
+                else: _wps=_wsum
             week_by_mo[mo].append({"key":i["key"],"summary":clean(f["summary"]),
                 "due":f.get("duedate",""),
                 "assignee":clean((f.get("assignee") or {}).get("displayName","Sin asignar")),
-                "status":f["status"]["name"]})
+                "status":f["status"]["name"],"ps":_wps,"es":_wes})
     total_week=sum(len(v) for v in week_by_mo.values())
     print("  Semana: "+str(total_week))
     
@@ -461,8 +473,30 @@ def main():
     print('Sin fecha + Sin responsable...')
     all_nondone=jira_all(
         "project in ("+ALL_SW_DYN+") AND statusCategory != Done AND status not in ('Bloqueada','Bloqueado','Blocked') ORDER BY project ASC",
-        ["summary","status","duedate","assignee","project"],100,50)
+        ["summary","status","duedate","assignee","project","parent"],100,50)
     _nd_total=len(all_nondone)
+
+    # Construir parent_map para jerarquía (task → parent → epic)
+    parent_map={}
+    for _iss in all_nondone:
+        _pf=_iss["fields"].get("parent")
+        if _pf:
+            _ptype=_pf.get("fields",{}).get("issuetype",{}).get("name","")
+            parent_map[_iss["key"]]={
+                "key": _pf.get("key",""),
+                "sum": clean(_pf.get("fields",{}).get("summary","")),
+                "type": _ptype
+            }
+
+    def get_ps_es(task_key):
+        """Obtiene parent summary (ps) y epic summary (es) para una tarea"""
+        pm=parent_map.get(task_key,{})
+        if not pm: return "",""
+        if pm["type"]=="Epic": return "",pm["sum"]
+        # Parent no es epic — buscar grandparent
+        gp=parent_map.get(pm["key"],{})
+        if gp.get("type")=="Epic": return pm["sum"],gp["sum"]
+        return pm["sum"],""
     print('  No-done total: '+str(_nd_total)+(' ⚠️ POSIBLE TRUNCADO (llegó al límite)' if _nd_total==5000 else ''))
 
     # Paso B: obtener conjunto de tareas con fecha CONFIRMADA por JQL
@@ -497,9 +531,10 @@ def main():
         if not mo_t: continue
         real_due=tf.get('duedate')    # valor REAL del API
         real_asn=tf.get('assignee')   # valor REAL del API
+        _ps,_es=get_ps_es(task['key'])
         t_data={'key':task['key'],'summary':clean(tf.get('summary') or ''),
             'due':real_due or '','assignee':clean((real_asn or {}).get('displayName','Sin asignar')),
-            'status':tf['status']['name']}
+            'status':tf['status']['name'],'ps':_ps,'es':_es}
         # SIN FECHA: sin date en API Y no está en confirmed_dated_keys
         # Doble verificación para manejar inconsistencias del API de Jira
         has_date = bool(real_due) or task['key'] in confirmed_dated_keys
@@ -711,6 +746,16 @@ def main():
     html=replace_var(html,"NO_DATE_TASKS",build_var("NO_DATE_TASKS",nodt_by_mo,str(total_nodt)+" sin fecha"))
     # Post-filtro: eliminar tareas que llegaron con assignee real
     html=replace_var(html,"NO_OWNER_TASKS",build_var("NO_OWNER_TASKS",noown_by_mo,str(total_noown)+" sin responsable"))
+    # Verificar fechas reales de tasks en curso (batch API puede tener stale duedate)
+    inprog_nodate_keys=[t['key'] for mo in inprog_by_mo.values() for t in mo if not t.get('due')]
+    if inprog_nodate_keys:
+        vi=verify_by_keys(inprog_nodate_keys,['duedate'])
+        date_map={v['key']:v['fields'].get('duedate') for v in vi if v['fields'].get('duedate')}
+        if date_map:
+            print('  En curso: '+str(len(date_map))+' tareas con fecha real encontrada → actualizando')
+            for mo in inprog_by_mo.values():
+                for t in mo:
+                    if t['key'] in date_map: t['due']=date_map[t['key']]
     total_inprog=sum(len(v) for v in inprog_by_mo.values())
     html=replace_var(html,"INPROG_TASKS",build_var("INPROG_TASKS",inprog_by_mo,str(total_inprog)+" en curso"))
     
