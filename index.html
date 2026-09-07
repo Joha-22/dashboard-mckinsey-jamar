@@ -382,6 +382,9 @@ tr.grand-total td{background:var(--slate-dk);color:#fff;font-weight:700;font-siz
 .noowner-tbl td{padding:4px 6px;border-bottom:1px solid #F3E5F5;color:#333;}
 .noowner-tbl tr:hover td{background:#F3E5F5;}
 .noowner-tbl .tk-key{color:#4527A0;font-weight:600;font-size:10px;}
+.tk-hier{font-size:9px;padding-left:10px;margin-top:1px;line-height:1.3;}
+.tk-parent{color:#888;}
+.tk-epic{color:#999;font-style:italic;}
 .nodate-badge{display:inline-flex;align-items:center;gap:3px;background:#FFF0F0;color:#C62828;border:1px solid #FFCDD2;border-radius:4px;padding:2px 8px;font-size:9.5px;font-weight:700;cursor:pointer;margin-top:4px;transition:background .15s;}
 .nodate-badge:hover{background:#FFEBEE;border-color:#EF9A9A;}
 .nodate-badge.open{background:#FFEBEE;}
@@ -2774,9 +2777,12 @@ function renderTable(data) {
             var daysDiff = Math.floor((new Date(todayStr) - new Date(task.duedate)) / 86400000);
             var daysLabel = daysDiff === 1 ? '1 d\u00EDa' : daysDiff + ' d\u00EDas';
             var dueClass  = daysDiff > 14 ? 'late-due critical' : 'late-due';
+            var _lhier='';
+            if(task.ps) _lhier+='<div class="tk-hier tk-parent">\u21b3 '+task.ps+'</div>';
+            if(task.es) _lhier+='<div class="tk-hier tk-epic">\u21b3 '+task.es+'</div>';
             return '<tr>'
               +'<td><a href="https://hubdigitaljamar.atlassian.net/browse/'+task.key+'" target="_blank">'+task.key+'</a></td>'
-              +'<td class="late-summary">'+task.summary+'</td>'
+              +'<td class="late-summary">'+task.summary+_lhier+'</td>'
               +'<td class="'+dueClass+'">'+task.duedate+'<br><span style="font-size:9px;font-weight:400;color:#888;">+'+daysLabel+'</span></td>'
               +'<td class="late-assignee">'+task.assignee+'</td>'
               +'</tr>';
@@ -2796,9 +2802,12 @@ function renderTable(data) {
             var dDiff = Math.floor((new Date(task.duedate) - new Date(todayStr)) / 86400000);
             var dc    = dDiff <= 2 ? 'week-due soon' : 'week-due';
             var label = dDiff === 0 ? 'Hoy' : dDiff === 1 ? 'Ma\u00F1ana' : dDiff + ' d\u00EDas';
+            var _whier='';
+            if(task.ps) _whier+='<div class="tk-hier tk-parent">\u21b3 '+task.ps+'</div>';
+            if(task.es) _whier+='<div class="tk-hier tk-epic">\u21b3 '+task.es+'</div>';
             return '<tr>'
               +'<td><a href="https://hubdigitaljamar.atlassian.net/browse/'+task.key+'" target="_blank">'+task.key+'</a></td>'
-              +'<td class="late-summary">'+task.summary+'</td>'
+              +'<td class="late-summary">'+task.summary+_whier+'</td>'
               +'<td class="'+dc+'">'+task.duedate+'<br><span style="font-size:9px;font-weight:400;color:#888;">'+label+'</span></td>'
               +'<td class="late-assignee">'+(task.assignee||'Sin asignar')+'</td>'
               +'</tr>';
@@ -2816,9 +2825,12 @@ function renderTable(data) {
         if(nodateCount > 0){
           var ndRows = nodateArr.map(function(task){
             var stBg = task.status && task.status.indexOf('curso')!==-1?'#66BB6A':task.status&&task.status.indexOf('hacer')!==-1?'#90A4AE':'#FFA726';
+            var _ndhier='';
+            if(task.ps) _ndhier+='<div class="tk-hier tk-parent">\u21b3 '+task.ps+'</div>';
+            if(task.es) _ndhier+='<div class="tk-hier tk-epic">\u21b3 '+task.es+'</div>';
             return '<tr>'
               +'<td><a href="https://hubdigitaljamar.atlassian.net/browse/'+task.key+'" target="_blank">'+task.key+'</a></td>'
-              +'<td class="late-summary">'+task.summary+'</td>'
+              +'<td class="late-summary">'+task.summary+_ndhier+'</td>'
               +'<td class="late-assignee">'+task.status+'</td>'
               +'<td class="late-assignee">'+(task.assignee||'Sin asignar')+'</td>'
               +'</tr>';
@@ -2835,8 +2847,11 @@ function renderTable(data) {
         // ── Fila detalle Sin responsable ──────────────────────────────────────
         if(noownerCount > 0) {
           var noownRows = noownerArr.map(function(task){
+            var _nhier='';
+            if(task.ps) _nhier+='<div class="tk-hier tk-parent">\u21b3 '+task.ps+'</div>';
+            if(task.es) _nhier+='<div class="tk-hier tk-epic">\u21b3 '+task.es+'</div>';
             return '<tr><td class="tk-key"><a href="https://hubdigitaljamar.atlassian.net/browse/'+task.key+'" target="_blank">'+task.key+'</a></td>'
-              +'<td>'+task.summary+'</td>'
+              +'<td>'+task.summary+_nhier+'</td>'
               +'<td style="color:#888;">'+(task.due ? task.due : 'Sin fecha')+'</td>'
               +'<td style="color:#888;">'+(task.status||'')+'</td>'
               +'</tr>';
@@ -2855,9 +2870,12 @@ function renderTable(data) {
           var inprogArr   = INPROG_TASKS[d.key] || [];
           var inprogCount = inprogArr.length;
           var inprogRows  = inprogArr.map(function(t){
+            var _ihier='';
+            if(t.ps) _ihier+='<div class="tk-hier tk-parent">\u21b3 '+t.ps+'</div>';
+            if(t.es) _ihier+='<div class="tk-hier tk-epic">\u21b3 '+t.es+'</div>';
             return '<tr>'
               +'<td class="tk-key"><a href="https://hubdigitaljamar.atlassian.net/browse/'+t.key+'" target="_blank">'+t.key+'</a></td>'
-              +'<td>'+t.summary+'</td>'
+              +'<td>'+t.summary+_ihier+'</td>'
               +'<td style="color:#888;">'+(t.due||'Sin fecha')+'</td>'
               +'<td style="color:#1565C0;font-weight:600;">'+t.status+'</td>'
               +'</tr>';
