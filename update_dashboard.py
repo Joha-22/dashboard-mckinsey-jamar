@@ -203,17 +203,16 @@ def main():
         return total,prog
     
     def fmt_task(t):
-        key     = str(t.get("key") or "")
-        summary = str(t.get("summary") or "")
-        due     = str(t.get("due") or "")
-        assignee= str(t.get("assignee") or "Sin asignar")
-        status  = str(t.get("status") or "")
-        ps      = str(t.get("ps") or "")
-        es      = str(t.get("es") or "")
-        return ("    {key:'"+key+"',summary:\""+summary+"\","
-                "duedate:'"+due+"',assignee:\""+assignee+"\","
-                "status:\""+status+"\","
-                "ps:\""+ps+"\",es:\""+es+"\" }")
+        key=str(t.get('key') or '')
+        summary=str(t.get('summary') or '')
+        due=str(t.get('due') or '')
+        assignee=str(t.get('assignee') or 'Sin asignar')
+        status=str(t.get('status') or '')
+        ps=str(t.get('ps') or '')
+        es=str(t.get('es') or '')
+        return ('{key:"'+key+'",summary:"'+summary+'",'
+                'duedate:"'+due+'",assignee:"'+assignee+'",'
+                'status:"'+status+'",ps:"'+ps+'",es:"'+es+'" }')
 
     def build_var(name,by_mo,comment):
         lines=["var "+name+" = {","  // "+TODAY+" \u2014 "+comment]
