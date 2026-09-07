@@ -2875,7 +2875,7 @@ function renderTable(data) {
             var _ihier='';
             if(t.ps) _ihier+='<div class="tk-hier tk-parent">\u21b3 '+t.ps+'</div>';
             if(t.es) _ihier+='<div class="tk-hier tk-epic">\u21b3 '+t.es+'</div>';
-            var _idue = t.due || 'Sin fecha';
+            var _idue = t.duedate || t.due || 'Sin fecha';
             var _iasn = (t.assignee && t.assignee !== 'Sin asignar') ? t.assignee : 'Sin responsable';
             return '<tr>'
               +'<td class="tk-key"><a href="https://hubdigitaljamar.atlassian.net/browse/'+t.key+'" target="_blank">'+t.key+'</a></td>'
