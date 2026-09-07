@@ -2876,11 +2876,14 @@ function renderTable(data) {
             var _ihier='';
             if(t.ps) _ihier+='<div class="tk-hier tk-parent">\u21b3 '+t.ps+'</div>';
             if(t.es) _ihier+='<div class="tk-hier tk-epic">\u21b3 '+t.es+'</div>';
+            var _idue = t.due || 'Sin fecha';
+            var _iasn = (t.assignee && t.assignee !== 'Sin asignar') ? t.assignee : 'Sin responsable';
             return '<tr>'
               +'<td class="tk-key"><a href="https://hubdigitaljamar.atlassian.net/browse/'+t.key+'" target="_blank">'+t.key+'</a></td>'
               +'<td>'+t.summary+_ihier+'</td>'
-              +'<td style="color:#888;">'+(t.due||'Sin fecha')+'</td>'
+              +'<td style="color:#888;">'+_idue+'</td>'
               +'<td style="color:#1565C0;font-weight:600;">'+t.status+'</td>'
+              +'<td style="color:#555;">'+_iasn+'</td>'
               +'</tr>';
           }).join('');
           html += '<tr class="inprog-detail-row" id="inprog-detail-'+d.key+'">'
@@ -2888,7 +2891,8 @@ function renderTable(data) {
             +'<div class="inprog-panel-title">\u25B6 Actividades en curso ('+inprogCount+')</div>'
             +'<table class="late-tbl"><thead><tr>'
             +'<th style="width:90px">Tarea</th><th>Actividad</th>'
-            +'<th style="width:100px">Fecha</th><th style="width:130px">Estado</th>'
+            +'<th style="width:90px">Fecha</th><th style="width:110px">Estado</th>'
+            +'<th style="width:130px">Responsable</th>'
             +'</tr></thead><tbody>'+inprogRows+'</tbody></table>'
             +'</div></td></tr>';        }
       });
